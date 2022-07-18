@@ -127,7 +127,7 @@ The results I found were very interesting! and these numbers were consistent in 
 
 So performance wise it’s still the same outcome reading asynchronously is a bit slower than reading synchronously.
 
-Now about the memory allocation, as shown in the results table, both benchmarks have allocated exactly 381 MB for the 10M objects, if we did some quick calculations we see that 40 Bytes * 10M is exactly 381.47 MB of memory. cool!
+Now about the memory allocation, as shown in the results table, both benchmarks have allocated exactly 381 MB for the 10M objects, if we did some quick calculations we see that 40 Bytes * 10M is exactly 381.47 MB of memory. Basically nothing other than our own objects allocations!
 
 Trying to replicate this results, I tried another object of size 72 Bytes, and I did the calculations before running the benchmarks, as I calculated the memory allocation should be exactly 686.65 MB.
 
