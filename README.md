@@ -49,6 +49,7 @@ public async Task ReadThenWrite()
 ```
 
 As shown below in the results table, when reading asynchronously the performance is a bit slower which makes sense because the read takes time till it’s notified that there are new elements written to the channel.
+
 The memory allocation in both cases was 72 Bytes, although this number was varying in different runs but it was close most of the times to this value. Based on these findings I believe that the memory allocations is actually minimal in the .NET channel implementations.
 
 ![Integers benchmark results](https://github.com/paola-homsi/.NetChannelsBenchmark/blob/master/NetChannelsBenchmark/assets/firstbenckmark.png)
