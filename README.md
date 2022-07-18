@@ -51,7 +51,7 @@ public async Task ReadThenWrite()
 As shown below in the results table, when reading asynchronously the performance is a bit slower which makes sense because the read takes time till it’s notified that there are new elements written to the channel.
 The memory allocation in both cases was 72 Bytes, although this number was varying in different runs but it was close most of the times to this value. Based on these findings I believe that the memory allocations is actually minimal in the .NET channel implementations.
 
-![Integers benchmark results](https://github.com/adam-p/.NetChannelsBenchmark/NetChannelsBenchmark/assets/firstbenckmark.png")
+![Integers benchmark results](https://github.com/paola-homsi/.NetChannelsBenchmark/blob/master/NetChannelsBenchmark/assets/firstbenckmark.png)
 
 However, I wanted to go a step further in this benchmark and try to write/read an object instead of just an integer, so I went ahead and created an object with a size of exactly 40 Bytes, then tried the same above benchmarks on it.
 
@@ -102,7 +102,7 @@ public async Task ReadThenWrite()
 
 The results I found were very interesting! and these numbers were consistent in every time I run the benchmark.
 
-![Objects benchmark results](https://github.com/adam-p/.NetChannelsBenchmark/NetChannelsBenchmark/assets/secondbenckmark.png")
+![Objects benchmark results](https://github.com/paola-homsi/.NetChannelsBenchmark/blob/master/NetChannelsBenchmark/assets/secondbenchmark.png)
 
 So performance wise it’s still the same outcome reading asynchronously is a bit slower than reading synchronously.
 
@@ -112,7 +112,7 @@ Trying to replicate this results, I tried another object of size 72 Bytes, and I
 
 Here’s the benchmark results!
 
-![Objects benchmark results](https://github.com/adam-p/.NetChannelsBenchmark/NetChannelsBenchmark/assets/thirdbenckmark.png")
+![Objects benchmark results](https://github.com/paola-homsi/.NetChannelsBenchmark/blob/master/NetChannelsBenchmark/assets/thridbenchmark.png)
 
 ## Summary
 I find these results very interesting because this means that the channels code itself is almost allocation free! and most of the allocation that will happen in our code is very predictable and completely depends on the size of our object.
