@@ -1,4 +1,4 @@
-# .NetChannelsBenchmark
+# .Net Channels Performance - Benchmarks
 ## Introduction
 In the [this article](https://github.com/paola-homsi/.NetChannels) here we talked about channels, what are they and how to create a channel write to it and read from it. 
 In this article let’s talk about the more interesting stuff, their Performance!
