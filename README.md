@@ -60,16 +60,16 @@ If we take a look inside ChannelReader we can see that its methods returns Value
 
 ```
 public abstract class ChannelReader<T>{
-public virtual ValueTask<T> ReadAsync(CancellationToken cancellationToken = default);
-public abstract ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = default);
+   public virtual ValueTask<T> ReadAsync(CancellationToken cancellationToken = default);
+   public abstract ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = default);
 }
 ```
 Same for ChannelWriter
 
 ```
 public abstract class ChannelWriter<T>{
-public abstract ValueTask<bool> WaitToWriteAsync(CancellationToken cancellationToken = default);
-public virtual ValueTask WriteAsync(T item, CancellationToken cancellationToken = default);
+   public abstract ValueTask<bool> WaitToWriteAsync(CancellationToken cancellationToken = default);
+   public virtual ValueTask WriteAsync(T item, CancellationToken cancellationToken = default);
 }
 ```
 
