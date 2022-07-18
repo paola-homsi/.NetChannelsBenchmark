@@ -54,6 +54,26 @@ The memory allocation in both cases was 72 Bytes, although this number was varyi
 
 ![Integers benchmark results](https://github.com/paola-homsi/.NetChannelsBenchmark/blob/master/NetChannelsBenchmark/assets/firstbenckmark.png)
 
+How is this low allocation is actually achieved?
+
+If we take a look inside ChannelReader we can see that its methods returns ValueTask instead of Task, which is internally a struct not a class and therefore it will be allocated on the stack not on the heap. Since we’re using integers and the channel is using ValueTask, this should explain the no allocated memory results above.
+
+```
+public abstract class ChannelReader<T>{
+public virtual ValueTask<T> ReadAsync(CancellationToken cancellationToken = default);
+public abstract ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = default);
+}
+```
+Same for ChannelWriter
+
+```
+public abstract class ChannelWriter<T>{
+public abstract ValueTask<bool> WaitToWriteAsync(CancellationToken cancellationToken = default);
+public virtual ValueTask WriteAsync(T item, CancellationToken cancellationToken = default);
+}
+```
+
+
 However, I wanted to go a step further in this benchmark and try to write/read an object instead of just an integer, so I went ahead and created an object with a size of exactly 40 Bytes, then tried the same above benchmarks on it.
 
 ```
@@ -116,10 +136,8 @@ Here’s the benchmark results!
 ![Objects benchmark results](https://github.com/paola-homsi/.NetChannelsBenchmark/blob/master/NetChannelsBenchmark/assets/thridbenchmark.png)
 
 ## Summary
-I find these results very interesting because this means that the channels code itself is almost allocation free! and most of the allocation that will happen in our code is very predictable and completely depends on the size of our object.
+I find these results very interesting because this means that the channels code itself is almost allocation free! and most of the allocation that will happen in our code is very predictable and it completely depends on the size of our object.
 
-I hope these findings make it much easier to decide the channel capacity based on the object size, the load of writes rate and the reads performance.
-
-
+Based on that deciding the capacity of a channel should be much easier since we know the size of our object, the writing rate on our channel and the reading performance as well.
 
 
