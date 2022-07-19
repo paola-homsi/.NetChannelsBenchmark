@@ -50,9 +50,29 @@ public async Task ReadThenWrite()
 
 As shown below in the results table, when reading asynchronously the performance is a bit slower which makes sense because the read takes time till it’s notified that there are new elements written to the channel.
 
-The memory allocation in both cases was 72 Bytes, although this number was varying in different runs but it was close most of the times to this value. Based on these findings I believe that the memory allocations is actually minimal in the .NET channel implementations.
+The memory allocation in both cases was 72 Bytes, although this number was varying in different runs but it was close most of the times to this value. Based on these findings I believe that the memory allocations is actually minimal in the .NET channel implementations. 
 
 ![Integers benchmark results](https://github.com/paola-homsi/.NetChannelsBenchmark/blob/master/NetChannelsBenchmark/assets/firstbenckmark.png)
+
+How is this low allocation is actually achieved?
+
+If we take a look inside ChannelReader we can see that its methods returns ValueTask instead of Task, which is internally a struct not a class and therefore it will be allocated on the stack not on the heap. Since we’re using integers and the channel is using ValueTask, this should explain the no allocated memory results above.
+
+```
+public abstract class ChannelReader<T>{
+   public virtual ValueTask<T> ReadAsync(CancellationToken cancellationToken = default);
+   public abstract ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = default);
+}
+```
+Same for ChannelWriter
+
+```
+public abstract class ChannelWriter<T>{
+   public abstract ValueTask<bool> WaitToWriteAsync(CancellationToken cancellationToken = default);
+   public virtual ValueTask WriteAsync(T item, CancellationToken cancellationToken = default);
+}
+```
+
 
 However, I wanted to go a step further in this benchmark and try to write/read an object instead of just an integer, so I went ahead and created an object with a size of exactly 40 Bytes, then tried the same above benchmarks on it.
 
@@ -107,7 +127,7 @@ The results I found were very interesting! and these numbers were consistent in 
 
 So performance wise it’s still the same outcome reading asynchronously is a bit slower than reading synchronously.
 
-Now about the memory allocation, as shown in the results table, both benchmarks have allocated exactly 381 MB for the 10M objects, if we did some quick calculations we see that 40 Bytes * 10M is exactly 381.47 MB of memory. cool!
+Now about the memory allocation, as shown in the results table, both benchmarks have allocated exactly 381 MB for the 10M objects, if we did some quick calculations we see that 40 Bytes * 10M is exactly 381.47 MB of memory. Basically nothing other than our own objects allocations!
 
 Trying to replicate this results, I tried another object of size 72 Bytes, and I did the calculations before running the benchmarks, as I calculated the memory allocation should be exactly 686.65 MB.
 
@@ -116,10 +136,8 @@ Here’s the benchmark results!
 ![Objects benchmark results](https://github.com/paola-homsi/.NetChannelsBenchmark/blob/master/NetChannelsBenchmark/assets/thridbenchmark.png)
 
 ## Summary
-I find these results very interesting because this means that the channels code itself is almost allocation free! and most of the allocation that will happen in our code is very predictable and completely depends on the size of our object.
+I find these results very interesting because this means that the channels code itself is almost allocation free! and most of the allocation that will happen in our code is very predictable and it completely depends on the size of our object.
 
-I hope these findings make it much easier to decide the channel capacity based on the object size, the load of writes rate and the reads performance.
-
-
+Based on that deciding the capacity of a channel should be much easier since we know the size of our object, the writing rate on our channel and the reading performance as well.
 
 
